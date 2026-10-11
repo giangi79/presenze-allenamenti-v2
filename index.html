@@ -66,6 +66,11 @@ header{min-height:90px;gap:12px}
 .calendar-day{background:rgba(249,252,255,.88)}
 .stats-row{border-bottom-color:rgba(83,121,158,.2)}
 @media(max-width:620px){header{min-height:78px;padding:12px 14px}.brand-logo{width:clamp(155px,51vw,240px);max-height:66px}.panel{background:rgba(245,250,255,.83)}#home>.panel{background:rgba(239,247,255,.71)}}
+
+/* Logo integrato nell'intestazione senza effetto rettangolo */
+.brand-header{border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.13);padding:7px 11px}
+.brand-logo{border-radius:9px;display:block;mix-blend-mode:multiply}
+@media(max-width:620px){.brand-header{border-radius:13px;padding:5px 7px}.brand-logo{border-radius:7px}}
 </style>
 <script>window.addEventListener("error",function(e){var x=document.getElementById("auth-status");if(x)x.textContent="Errore di avvio: "+e.message+" (riga "+e.lineno+")"});window.addEventListener("unhandledrejection",function(e){var x=document.getElementById("auth-status");if(x)x.textContent="Errore di connessione: "+(e.reason?.message||String(e.reason))});</script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" onerror="document.documentElement.dataset.supabaseLoadError='1'"></script></head>
 <body>
