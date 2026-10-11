@@ -13,22 +13,47 @@
 <nav class="tabs" aria-label="Sezioni"><button class="active" data-tab="dashboard">Dashboard</button><button data-tab="registro">Registra presenze</button><button data-tab="atleti">Atleti</button></nav>
 <section id="dashboard" class="view"><div class="panel"><h2>Panoramica del gruppo</h2><div class="controls"><label>Gruppo<br><select id="dashboard-group"></select></label><label>Data<br><input type="date" id="dashboard-date"></label></div><div class="stats"><div class="stat"><span>Atleti del gruppo</span><strong id="total">0</strong></div><div class="stat"><span>Presenti</span><strong id="present">0</strong></div><div class="stat"><span>Da registrare</span><strong id="pending">0</strong></div></div></div><div class="panel"><h2>Accesso rapido</h2><p>Registra le presenze per gruppo e giorno, senza finestre di conferma inutili.</p><button class="primary" id="go-register">Apri registro →</button></div></section>
 <section id="registro" class="view hidden"><div class="panel"><h2>Registra presenze</h2><div class="controls"><label>Data<br><input type="date" id="date"></label><label>Gruppo<br><select id="group"></select></label></div><p class="muted">Tocca Presente o Assente. Puoi annullare una scelta toccando di nuovo lo stesso pulsante.</p><div id="attendance"></div></div></section>
-<section id="atleti" class="view hidden"><div class="panel"><h2>Elenco atleti — dati dimostrativi</h2><div class="controls"><input class="search" id="search" placeholder="Cerca un atleta..." aria-label="Cerca atleta"></div><div id="athletes"></div></div></section>
-<div class="notice"><strong>Ambiente di prova.</strong> I nominativi sono inventati e le scelte restano solo nella memoria di questa pagina. Nessuna connessione al database originale, nessuna scrittura su Supabase.</div>
+<section id="atleti" class="view hidden"><div class="panel"><h2>Gestione atleti — ambiente demo</h2><form id="athlete-form"><input type="hidden" id="edit-id"><div class="controls"><label>Nome e cognome<br><input id="athlete-name" required maxlength="90" placeholder="Nome Cognome"></label><label>Gruppo<br><select id="athlete-group"></select></label><button class="primary" type="submit" id="save-athlete">Aggiungi atleta</button><button type="button" id="cancel-edit" class="hidden">Annulla modifica</button></div></form><div class="controls"><input class="search" id="search" placeholder="Cerca un atleta..." aria-label="Cerca atleta"><label><input type="checkbox" id="show-archived"> Mostra archiviati</label></div><div id="athletes"></div></div></section>
+<div class="notice"><strong>Ambiente di prova.</strong> I nominativi iniziali sono inventati. Le modifiche agli atleti si salvano solo in questo browser (localStorage); le presenze restano temporanee. Nessuna connessione al database originale, nessuna scrittura su Supabase.</div>
 </main>
 <script>
 "use strict";
-const demo=[{id:1,nome:"Alex Rossi",gruppo:"Cuccioli"},{id:2,nome:"Sam Bianchi",gruppo:"Cuccioli"},{id:3,nome:"Luca Verdi",gruppo:"Piccoli"},{id:4,nome:"Giulia Neri",gruppo:"Piccoli"},{id:5,nome:"Andrea Blu",gruppo:"Grandi"},{id:6,nome:"Marta Gialli",gruppo:"Serale"}];
+const defaults=[{id:1,nome:"Alex Rossi",gruppo:"Cuccioli"},{id:2,nome:"Sam Bianchi",gruppo:"Cuccioli"},{id:3,nome:"Luca Verdi",gruppo:"Piccoli"},{id:4,nome:"Giulia Neri",gruppo:"Piccoli"},{id:5,nome:"Andrea Blu",gruppo:"Grandi"},{id:6,nome:"Marta Gialli",gruppo:"Serale"}];
 const groups=["Cuccioli","Piccoli","Grandi","Serale"], marks=new Map();
+const STORAGE="presenze-v2-demo-atleti-v1";let demo;try{const saved=JSON.parse(localStorage.getItem(STORAGE));demo=Array.isArray(saved)?saved:defaults.map(a=>({...a,archiviato:false}));}catch{demo=defaults.map(a=>({...a,archiviato:false}))}
+function persist(){try{localStorage.setItem(STORAGE,JSON.stringify(demo))}catch{alert("Impossibile salvare i dati demo su questo browser.")}}
 const $=id=>document.getElementById(id);
 const today=new Date();const isoToday=today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");
 $("date").value=isoToday;$("dashboard-date").value=isoToday;
-for(const id of ["group","dashboard-group"])$(""+id).replaceChildren(...groups.map(g=>{const o=document.createElement("option");o.value=g;o.textContent=g;return o}));
+for(const id of ["group","dashboard-group","athlete-group"])$(""+id).replaceChildren(...groups.map(g=>{const o=document.createElement("option");o.value=g;o.textContent=g;return o}));
 function key(a){return $("date").value+"|"+a.id}
-function activeAthletes(){return demo.filter(a=>a.gruppo===$("group").value)}
+function activeAthletes(){return demo.filter(a=>!a.archiviato&&a.gruppo===$("group").value)}
 function updateStats(){const list=activeAthletes();$("total").textContent=list.length;$("present").textContent=list.filter(a=>marks.get(key(a))==="presente").length;$("pending").textContent=list.filter(a=>!marks.has(key(a))).length}
 function render(){updateStats();$("attendance").replaceChildren();for(const a of activeAthletes()){const row=document.createElement("div");row.className="athlete";const info=document.createElement("div");const strong=document.createElement("strong");strong.textContent=a.nome;info.append(strong);const actions=document.createElement("div");actions.className="actions";for(const [value,label] of [["presente","✓ Presente"],["assente","✕ Assente"]]){const b=document.createElement("button");b.textContent=label;b.className=(value==="assente"?"absent ":"")+(marks.get(key(a))===value?"selected":"");b.setAttribute("aria-pressed",String(marks.get(key(a))===value));b.onclick=()=>{marks.get(key(a))===value?marks.delete(key(a)):marks.set(key(a),value);render()};actions.append(b)}row.append(info,actions);$("attendance").append(row)}}
-function renderAthletes(){const q=$("search").value.trim().toLocaleLowerCase("it");$("athletes").replaceChildren();for(const a of demo.filter(a=>a.nome.toLocaleLowerCase("it").includes(q))){const row=document.createElement("div");row.className="athlete";const name=document.createElement("strong");name.textContent=a.nome;const group=document.createElement("small");group.textContent=a.gruppo;const box=document.createElement("div");box.append(name,group);row.append(box);$("athletes").append(row)}}
+function renderAthletes(){
+ const q=$("search").value.trim().toLocaleLowerCase("it"),show=$("show-archived").checked;
+ $("athletes").replaceChildren();
+ const matching=demo.filter(a=>(show||!a.archiviato)&&a.nome.toLocaleLowerCase("it").includes(q));
+ if(!matching.length){const p=document.createElement("p");p.className="muted";p.textContent="Nessun atleta trovato."; $("athletes").append(p)}
+ for(const a of matching){
+  const row=document.createElement("div");row.className="athlete";
+  const box=document.createElement("div"),name=document.createElement("strong"),detail=document.createElement("small");
+  name.textContent=a.nome;detail.textContent=a.gruppo+(a.archiviato?" · Archiviato":"");box.append(name,detail);
+  const actions=document.createElement("div");actions.className="actions";
+  const edit=document.createElement("button");edit.textContent="Modifica";edit.onclick=()=>{$("edit-id").value=a.id;$("athlete-name").value=a.nome;$("athlete-group").value=a.gruppo;$("save-athlete").textContent="Salva modifica";$("cancel-edit").classList.remove("hidden");$("athlete-name").focus()};
+  const archive=document.createElement("button");archive.textContent=a.archiviato?"Riattiva":"Archivia";archive.onclick=()=>{a.archiviato=!a.archiviato;persist();render();renderAthletes()};
+  const del=document.createElement("button");del.textContent="Elimina";del.onclick=()=>{if(!confirm("Eliminare definitivamente "+a.nome+" dalla demo?"))return;demo=demo.filter(x=>x.id!==a.id);for(const k of marks.keys())if(k.endsWith("|"+a.id))marks.delete(k);persist();resetForm();render();renderAthletes()};
+  actions.append(edit,archive,del);row.append(box,actions);$("athletes").append(row)
+ }
+}
+function resetForm(){$("athlete-form").reset();$("edit-id").value="";$("save-athlete").textContent="Aggiungi atleta";$("cancel-edit").classList.add("hidden")}
+$("athlete-form").onsubmit=e=>{e.preventDefault();const nome=$("athlete-name").value.trim().replace(/\s+/g," "),gruppo=$("athlete-group").value,id=$("edit-id").value;if(!nome)return;
+ if(demo.some(a=>a.nome.toLocaleLowerCase("it")===nome.toLocaleLowerCase("it")&&String(a.id)!==id)){alert("Esiste già un atleta con questo nome.");return}
+ if(id){const a=demo.find(a=>String(a.id)===id);if(!a)return;a.nome=nome;a.gruppo=gruppo}
+ else demo.push({id:Math.max(0,...demo.map(a=>Number(a.id)||0))+1,nome,gruppo,archiviato:false});
+ persist();resetForm();render();renderAthletes()
+};
+$("cancel-edit").onclick=resetForm;$("show-archived").onchange=renderAthletes;
 function tab(id){document.querySelectorAll(".view").forEach(el=>el.classList.toggle("hidden",el.id!==id));document.querySelectorAll("[data-tab]").forEach(el=>el.classList.toggle("active",el.dataset.tab===id));if(id==="dashboard")updateStats()}
 document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>tab(b.dataset.tab));$("go-register").onclick=()=>tab("registro");$("group").onchange=()=>{$("dashboard-group").value=$("group").value;render()};$("date").onchange=()=>{$("dashboard-date").value=$("date").value;render()};$("dashboard-group").onchange=()=>{$("group").value=$("dashboard-group").value;render()};$("dashboard-date").onchange=()=>{$("date").value=$("dashboard-date").value;render()};$("search").oninput=renderAthletes;render();renderAthletes();
 </script>
