@@ -58,9 +58,9 @@ $("cancel-edit").onclick=resetForm;$("show-archived").onchange=renderAthletes;
 function tab(id){document.querySelectorAll(".view").forEach(el=>el.classList.toggle("hidden",el.id!==id));document.querySelectorAll("[data-tab]").forEach(el=>el.classList.toggle("active",el.dataset.tab===id));if(id==="dashboard")updateStats()}
 document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>tab(b.dataset.tab));$("go-register").onclick=()=>tab("registro");$("group").onchange=()=>{$("dashboard-group").value=$("group").value;render()};$("date").onchange=()=>{$("dashboard-date").value=$("date").value;render()};$("dashboard-group").onchange=()=>{$("group").value=$("dashboard-group").value;render()};$("dashboard-date").onchange=()=>{$("date").value=$("dashboard-date").value;render()};$("search").oninput=renderAthletes;render();renderAthletes();
 async function refreshAuth(){if(!pa2){$("auth-status").textContent="Servizio di accesso non disponibile.";return}
-const {data:{user}}=await pa2.auth.getUser();const authorized=user?.email?.toLowerCase()===ADMIN_EMAIL;
-$("auth-form").classList.toggle("hidden",!!user);$("auth-logout").classList.toggle("hidden",!user);
-$("auth-status").textContent=authorized?"Accesso effettuato come amministratore. La sincronizzazione delle presenze verrà attivata successivamente.":user?"Account non autorizzato per Presenze V2.":"Accedi con l'account amministratore Supabase. I dati demo non sono ancora sincronizzati."}
+const {data:{user}}=await pa2.auth.getUser();const authorized=user?.email?.trim().toLowerCase()===ADMIN_EMAIL;
+$("auth-form").classList.toggle("hidden",authorized);$("auth-logout").classList.toggle("hidden",!user);
+$("auth-status").textContent=authorized?"Accesso effettuato come amministratore. La sincronizzazione delle presenze verrà attivata successivamente.":user?"Sessione attiva con "+(user.email||"un altro account")+". Per entrare come amministratore, premi Esci e accedi con "+ADMIN_EMAIL+".":"Accedi con l'account amministratore Supabase. I dati demo non sono ancora sincronizzati."}
 $("auth-form").onsubmit=async e=>{e.preventDefault();if(!pa2)return;const b=$("auth-form").querySelector("button");b.disabled=true;
 const {error}=await pa2.auth.signInWithPassword({email:$("auth-email").value.trim(),password:$("auth-password").value});$("auth-password").value="";b.disabled=false;
 if(error)$("auth-status").textContent="Accesso non riuscito: "+error.message;else await refreshAuth()};
