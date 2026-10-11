@@ -18,6 +18,39 @@
 .quick-date-wrap{width:100%;position:relative}.quick-date-toggle{display:block;width:100%;padding:16px;border:1px solid #ccd8e5;border-radius:12px;background:white;color:#17283b;font-weight:750;text-align:center}.quick-date-calendar{background:white;border:1px solid #d5e0ec;border-radius:14px;padding:12px;margin-top:8px;box-shadow:0 6px 18px #17324b18}.quick-date-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}.quick-date-head button{border:1px solid #d5e0ec;background:#f3f7fc;border-radius:9px;padding:8px 13px}.quick-date-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}.quick-date-days button{min-width:0;border:1px solid transparent;background:#f4f7fb;border-radius:8px;min-height:40px;padding:4px 0;color:#183c60}.quick-date-days button.selected{background:#2468b5;color:white}.quick-date-days strong{text-align:center;color:#60758a;font-size:.78rem;padding:6px 0}
 .quick-date-controls{display:flex;align-items:stretch;gap:8px;width:100%}.quick-date-controls .quick-date-toggle{flex:1;min-width:0}.quick-date-today{flex:0 0 auto;padding:12px 15px;border:1px solid #c9d9eb;border-radius:12px;background:#eaf3ff;color:#205b9c;font-weight:750}.quick-date-today:active{background:#d6e8ff}@media(max-width:390px){.quick-date-today{padding:10px 12px}.quick-date-controls .quick-date-toggle{font-size:.9rem;padding:12px 7px}}
 .juvenilia-home-logo{display:block;width:min(100%,420px);max-height:180px;object-fit:contain;margin:0 auto 22px}.home-groups{position:relative}@media(max-width:520px){.juvenilia-home-logo{width:min(100%,310px);max-height:130px;margin-bottom:18px}}
+
+/* Tema Juvenilia: fotografia pista, leggibilità e contrasti coerenti */
+:root{color-scheme:light;background:#10263d}
+html{min-height:100%;background:#10263d}
+body{min-height:100vh;min-height:100dvh;color:#142b43;background:linear-gradient(180deg,rgba(8,27,47,.72),rgba(11,34,57,.56) 46%,rgba(9,29,49,.76)),url("assets/pista-sfondo.webp") center center/cover fixed no-repeat;background-color:#10263d}
+header{background:rgba(9,30,52,.96);border-bottom:2px solid #e3bb4a;box-shadow:0 5px 24px rgba(0,0,0,.16)}
+header h1{color:#fff;line-height:1.25}
+.shell{position:relative}
+.panel{background:rgba(255,255,255,.96);color:#172b41;border:1px solid rgba(255,255,255,.75);box-shadow:0 12px 34px rgba(2,19,35,.24);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+.panel h2,.panel strong{color:#173653}
+.panel .muted{color:#526579}
+.tabs{background:rgba(9,30,52,.86);padding:8px;border-radius:14px;box-shadow:0 5px 18px rgba(0,0,0,.15)}
+.tabs button{background:#fff;color:#163d64}
+.tabs button.active{background:#245f9e;color:#fff}
+.tabs #admin-toggle{background:#f0f5fa;color:#163d64}
+.home-group{background:#f0f5fc;border:2px solid #cfdeec;color:#153c63;box-shadow:0 3px 9px rgba(16,43,71,.08)}
+.home-group:hover,.home-group:focus-visible{background:#e0edfc;border-color:#2864a4}
+.home-group:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #e7bd47;outline-offset:2px}
+.juvenilia-home-logo{filter:drop-shadow(0 2px 3px rgba(255,255,255,.3))}
+.quick-date-toggle,.quick-date-today,.simple-mark,.calendar-day,.group-choice{color:#173c61}
+.quick-date-today{background:#e8f2ff;border-color:#a9c9e9}
+.quick-date-days button.selected,.group-choice.selected{background:#245f9e;color:#fff}
+.calendar-day.complete-marks{background:#d8f4e4;border-color:#65bc8d}
+.calendar-day.has-marks{background:#fff0c3;border-color:#d9b558}
+.calendar-day.complete-marks small{color:#145a3b}
+.calendar-day.has-marks small{color:#74500d}
+.count-present{background:#dff5e9;color:#155f3e}
+.count-absent{background:#ffe9e9;color:#942d35}
+.count-pending{background:#e9eef5;color:#41556d}
+.simple-mark.selected.presente{color:#075e36}
+.simple-mark.selected.assente{color:#942d35}
+.connection-warning{background:#fff2d6;color:#66430b;border:1px solid #e8c979}
+@media(max-width:620px){body{background:linear-gradient(180deg,rgba(8,27,47,.76),rgba(11,34,57,.62) 45%,rgba(9,29,49,.8)),url("assets/pista-sfondo.webp") center center/cover no-repeat;background-attachment:scroll}.panel{background:rgba(255,255,255,.97)}.tabs{gap:6px}.tabs button{min-width:0}.shell{padding-bottom:max(90px,env(safe-area-inset-bottom))}}
 </style>
 <script>window.addEventListener("error",function(e){var x=document.getElementById("auth-status");if(x)x.textContent="Errore di avvio: "+e.message+" (riga "+e.lineno+")"});window.addEventListener("unhandledrejection",function(e){var x=document.getElementById("auth-status");if(x)x.textContent="Errore di connessione: "+(e.reason?.message||String(e.reason))});</script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" onerror="document.documentElement.dataset.supabaseLoadError='1'"></script></head>
 <body>
